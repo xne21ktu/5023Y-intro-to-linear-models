@@ -98,14 +98,68 @@ means %>%
 # the standard error (and so 95% CI) are the same. This assumption still needs to be checked to trust results.
 
 # Assumption Checking ----
+# In this first part we are going to check two of our assumptions:
+
+# 1) that the residual/unexplained variance in our data is approximately normally distributed (used to calc SE and CI)
+
+# 2) that the residual/unexplained variance is approximately equal between our groups
+
+#Residuals are the differences between the observed values and the fitted values produced by the model,
+#in this case the heights of the plants against the treatment means.
+
+performance::check_model(lsmodel1) # checks assumptions
+
+#Normal distribution ----
+
+plot(lsmodel1, which=c(2,2)) # produces Q-Q plot
+
+# qqplot distributes your data on the y-axis, and a theoretical normal distribution on the x-axis. 
+# If the residuals follow a normal distribution, they should meet to produce a perfect diagonal line across the plot.
+# most of our residuals can be explained by a normal distribution, except at the extreme low end of our data.
+# This is not surprising, as we already identified some potential outliers.
 
 
+# Equal variance ----
+
+performance::check_model(lsmodel1, check="homogeneity")
+# provides what we call 'standardized residuals' where we divide the residual error by the standard deviation.
+# we can see that the higher fitted values (Cross treatment) appears to be more variable than the lower fitted values.
+# this is not too bad, and most likely influenced by outliers
+
+plot(lsmodel1, which=c(1,3)) #plot the residuals (variance) of our data against the fitted (predicted) values. 
+#If the residuals were zero, this would mean there is no error, and our data exactly matches our estimates.
+#In reality, there will always be residual error, but as long as it is evenly distributed between treatments this is ok.
 
 
+# Outliers ----
+performance::check_model(lsmodel1, check="outliers")
 
+#gives contours to indicate whether data points fall inside or outside the margins for affecting fit
 
+plot(lsmodel1, which=c(4,4))
 
+# values are being measured against cook's distance = measure of how much 'leverage' a single data point is exerting on the model, 
+# if it is too high, it may be having an outsized effect on the estimates. 
 
+# Summary ----
 
+#Our model is not perfect, however it is reasonably good. 
+# we have basically carried out a students t-test, however are plants are paired,
+# and so we should carry out a paired t-test
+# a linear model sets one factor level as the 'intercept' estimates its mean, 
+# then draws a line from the first treatment to the second treatment, 
+# the slope of the line is the difference in means between the two treatments.
+# The difference in means is always accompanied by a standard error of the difference (SED), 
+# and this can be used to calculate a 95% confidence interval.
+# If this confidence interval does not contain the intercept value, we can reject the null hypothesis that there is 'no effect'.
 
+darwin %>% 
+  ggplot(aes(x=type, 
+             y=height))+
+  geom_jitter(width=0.1, 
+              pch=21, 
+              aes(fill=type))+
+  theme_classic()+
+  geom_segment(aes(x=1, xend=2, y=20.192, yend=20.192-2.617), linetype="dashed")+
+  stat_summary(fun.y=mean, geom="crossbar", width=0.2) 
 
