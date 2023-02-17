@@ -139,4 +139,43 @@ rbind(m1,m2) %>%
 # Power is expressed as 1-β. You want beta error typically to be less than 20%. 
 # So, you want a power of about 80%. That is you have an 80% chance of finding an effect if it's there.
 
+# Repeatability ----
+# It is not possible for you to know from a single experiment whether you have made Type 1 or Type 2 errors.
+# over time as experiments are eventually repeated the literature builds up allowing us to synthesise the evidence.
 
+set.seed(1234)
+
+myList <- vector("list", 20)
+y <- tibble()
+
+for (i in 1:length(myList)) { 
+  
+  x <-  rnorm(n=12, mean=2.6, sd=2.83)
+  data <- tibble(x)
+  temp <- lm(x~1, data=data) %>% 
+    broom::tidy(conf.int=T) 
+  y <- rbind(y,temp)  
+  
+}
+
+y$`experiment number` <- rep(1:20)
+
+# the new dataframe y contains the results of 20 new experiments
+y %>% 
+  mutate(`p value < 0.05` = if_else(p.value > 0.049, "non-significant", "significant")) %>% 
+  group_by(`p value < 0.05`) %>% 
+  summarise(`number of experiments`=n())
+# nearly a third of the experiments did not find a statistically significant difference.
+# A less formal review of the research might tally these P-values and conclude that there are inconsistent results in the literature.
+# A better way would be to look at the estimates and calculated confidence intervals.
+
+y %>% 
+  ggplot(aes(x=`experiment number`, y=estimate))+
+  geom_pointrange(aes(ymin = conf.low, ymax=conf.high))+
+  labs(y = "Estimated mean effect of outcrossing")+
+  geom_hline(linetype="dashed", yintercept=0.05)+
+  theme_minimal()
+# it is clearer to see that the results are not really inconsistent, 
+# the negative effects of inbreeding depression are clear to see in all of the experiments,
+# we are simply observing the effect of sampling error.
+# All 20 studies showed the effect of inbreeding depression, and all the experiments have identical levels of uncertainty.
