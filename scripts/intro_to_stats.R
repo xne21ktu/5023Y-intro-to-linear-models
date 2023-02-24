@@ -124,7 +124,6 @@ upperCI
 # technically it refers to the fact that if we kept running this experiment again, 
 # and again the intervals we calculate would capture the true mean in 95% of experiments. 
 # So really we are saying that we are confident we would capture the true mean in 95% of our experiments.
-
 # The maize plants that have been cross pollinated were taller on average than the self-pollinated plants, 
 # with a mean difference in height of 2.62 [0.18, 5.06] inches (mean [95% CI]).
 
