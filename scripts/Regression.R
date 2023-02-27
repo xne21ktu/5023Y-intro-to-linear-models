@@ -119,3 +119,49 @@ janka %>%
 
 # Confidence intervals 
 broom::tidy(janka_ls1, conf.int=T, conf.level=0.95)
+# minimum effect size (at 95% confidence) of density on the janka scale = 52.9
+
+# Effect size
+summary(janka_ls1)
+# 95% of the variance in timber hardness can be explained by wood density (R^2 = 0.95)
+
+# Assumptions ----
+janka_ls1 %>% # ls = least squares (referring to ordianry least squares method)
+  broom::augment() %>% 
+  head()
+# shows residuals of each data point
+
+augmented_ls1 <- janka_ls1 %>% 
+  broom::augment()
+
+augmented_ls1 %>% 
+  ggplot(aes(x=dens, 
+             y=.fitted))+
+  geom_line()+ 
+  geom_point(aes(x=dens, 
+                 y=hardness))+
+  geom_segment(aes(x=dens, 
+                   xend=dens, 
+                   y=.fitted, 
+                   yend=hardness), 
+               linetype="dashed", colour="red")
+# graph showing residuals
+
+model_plot <- function(data=augmented_ls1, 
+                       x="dens", 
+                       y="hardness", 
+                       title="Full data"){
+  ggplot(aes(x=.data[[x]], 
+             y=.data[[y]]), 
+         data=data)+
+    geom_line()+
+    theme_bw()+
+    ggtitle(title)
+}
+
+p1 <- model_plot()
+p2 <- model_plot(y=".fitted", title="Linear prediction")
+p3 <- model_plot(y=".resid", title="Remaining pattern")
+
+library(patchwork)
+p1+p2+p3
