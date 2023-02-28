@@ -17,6 +17,8 @@ head(janka)
 colnames(janka)
 
 
+
+
 # clean up column names
 
 
@@ -165,3 +167,60 @@ p3 <- model_plot(y=".resid", title="Remaining pattern")
 
 library(patchwork)
 p1+p2+p3
+
+# normal distribution?
+performance::check_model(janka_ls1, check=c("normality","qq"))
+
+# Equal variance?
+performance::check_model(janka_ls1, check="homogeneity")
+# the plot we constructed earlier we had the 'raw' residuals as a function of the fitted values. 
+# the plot we have produced now is the 'standardized residuals',
+# this is the raw residual divided by the standard deviation.
+# suggests that the residuals do not have constant variance, broadly speaking the amount of variance y increases as x increases. 
+# This means we have less confidence in our predictions at high values of density.
+
+# Outliers
+performance::check_model(janka_ls1, check="outliers")
+# 1 potential outlier
+
+# Prediction ----
+# Using the coefficients of the intercept and the slope,
+# we can make predictions on new data
+
+coef(janka_ls1)
+# imagine we have a new wood samples with a density of 65, 
+# how can we use the equation for a linear regression to predict what the timber hardness for this wood sample should be?
+# y = a + bx
+
+# -1160.49970 + 57.50667 * 65 = 2577.434
+
+coef(janka_ls1)[1] + coef(janka_ls1)[2] * 65
+# can use the coefficients of the model directly to make predictions
+# or we can use the functions predict and broom::augment
+
+predict(janka_ls1, newdata=list(dens=c(22,35,65)))
+
+broom::augment(janka_ls1, 
+               newdata=tibble(dens=c(22,35,65)))
+# We can also add standard error and confidence intervals to these predictions
+
+broom::augment(janka_ls1, newdata = tibble(dens=c(22,35,65)), se=TRUE)
+# standard error
+
+broom::augment(janka_ls1, newdata=tibble(dens=c(22,35,65)), interval="confidence")
+# confidence intervals
+
+# Add these to a plot
+
+pred_newdata <- broom::augment(janka_ls1, 
+                               newdata=tibble(dens=c(22,35,65)))
+
+janka %>% 
+  ggplot(aes(x=dens, y=hardness))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  geom_point(data=pred_newdata, aes(y=.fitted, x=dens), colour="red")+
+  geom_label(data=pred_newdata, (aes(y=(.fitted+10), x=(dens+3), label=round(.fitted, digits=0))))+
+  theme_bw()+
+  labs(x="Density", y="Timber Hardness")+
+  scale_x_continuous(limits=c(20,80), expand=expansion(add=c(0,5)))
