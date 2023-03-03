@@ -16,3 +16,7 @@ Lesson 4: Regression:
 
 In today's lesson, we learnt about how Linear models can not only test differences of means in categorical groupings, but also test relationships between continuous variables (regression). We explored the relationship between the explanatory variable (x axis - density) and response variable (y axis - wood hardness), using the straight line equation. 
 In linear regressions, the intercept is the value of y when x = 0, and through the use of centering,  we learnt how to make the intercept more useful. We continued to learn that the same assumptions apply, including that the residuals (unexplained variance around the regression line) is normal distributed and of equal variance. When these assumptions have been checked, we are then able to make predictions of wood hardness (y values) from density (x values), using confidence intervals to measure any uncertainty.
+
+Lesson 5: ANOVA:
+
+In today's lesson, we learnt how to use ANOVA tables for our linear model. The tables partition the variance into signal(s) and noise, which can be compared using an F-test. This creates a 'signal-to-noise' ratio, or the variability explained by the slope of the linear model, vs unexplained variance. ANOVA can be used to for complex analyses where many comparisons can be made. An initial F-test can provide evidence for whether there are any differences at all, reducing the risk of overtesting and the false positives (Type 1 errors) that can be generated.
