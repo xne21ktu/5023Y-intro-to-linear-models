@@ -127,4 +127,42 @@ drop1(ls_2, test = "F")
 
 #There was an interactive effect of light and fertiliser treatments (ANOVA F1,60 = 4.25, P = 0.044) in which combining treatments produced substantially more biomass (95.4g [95% CI: 2.8 - 188]) than expected from the additive effects alone (Fertiliser 93.7g [28.2 - 159.2], Light 30.1g [-35.3 - 95.6]).
 
+# main effects ----
 
+# If there is interactions in the model, then the drop1 function stops, this is because if this interaction is significant, then the main effects need to be included, even if they are not significant on their own.
+# If we decide to include reports of the main effect then estimates and confidence intervals should come from the full model(one-way ANOVA in this ex), but we need to produce an interaction free model to produce accurate F-values (especially for unbalanced designs)
+
+# we have to remove the interaction term before we can keep using drop1()
+
+ls_3 <- lm(biomass_m2 ~ fert + light, data = biomass)
+
+drop1(ls_3, test = "F")
+
+# provides more accurate F values for the main effects
+
+#_____________________----
+# Balanced/Unbalanced Designs ----
+
+# When designs are not balanced then the order matters when we use anova() - this is because the sum of squares is calculated sequentially (in the order of the formula), and so we could get different results depending on the order in which we assemble predictors into our model.
+
+# make three vectors and combine them into a new tibble
+
+#________________________----
+# Activity 1: Sum of Squares ----
+height <- c(50,57,91,94,102,110,57,71,85,105,120)
+size <- c(rep("small", 2), rep("large", 4), rep("small", 3), rep("large", 2))
+treatment <- c(rep("Control", 6), rep("Removal", 5))
+
+unbalanced <- tibble(height, size, treatment)
+
+unbalanced
+
+ls_4 <- lm(height ~ size + treatment, data = unbalanced)
+anova(ls_4)
+
+ls_5 <- lm(height ~ treatment + size, data = unbalanced)
+anova(ls_5)
+
+drop1(ls_4, test = "F")
+
+drop1(ls_5, test = "F")
