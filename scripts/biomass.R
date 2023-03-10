@@ -162,7 +162,21 @@ anova(ls_4)
 
 ls_5 <- lm(height ~ treatment + size, data = unbalanced)
 anova(ls_5)
-
+# when comparing the two models, using the same data and predictors but due to the different order, the conclusions are different
 drop1(ls_4, test = "F")
 
 drop1(ls_5, test = "F")
+
+# does not matter what order the terms are for drop1
+
+#_____________________----
+# post hoc ----
+
+emmeans::emmeans(ls_2, specs = pairwise ~ light + fert + light:fert) %>% 
+  confint()
+# including the argument pairwise in front of the ~ prompts the post-hoc pairwise comparisons.
+# $emmeans contains the estimate mean values for each possible combination (with confidence intervals)
+# $ contrasts contains tukey test post hoc comparisons between levels
+
+# In this example it is unnecessary to spend time looking at pairwise comparisons between the four possible levels, the interesting finding is to report the strength of the interaction effect. 
+# however you can do this using the emmeans:emmeans function
