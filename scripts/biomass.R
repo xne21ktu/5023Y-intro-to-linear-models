@@ -180,3 +180,81 @@ emmeans::emmeans(ls_2, specs = pairwise ~ light + fert + light:fert) %>%
 
 # In this example it is unnecessary to spend time looking at pairwise comparisons between the four possible levels, the interesting finding is to report the strength of the interaction effect. 
 # however you can do this using the emmeans:emmeans function
+
+#_____________________----
+# Continuous Linear models ----
+# Previously looked at interaction between two categorical variables but can also look at interactions between a factor and continuous variable (ANCOVA)
+# Activity 2 ----
+# import data
+pollution <- read_csv(here("data", "pollution.csv"))
+
+# check the structure of the data
+glimpse(pollution)
+
+# check data is in a tidy format
+head(pollution)
+
+# check variable names
+colnames(pollution)
+
+# check for duplication
+pollution %>% 
+  duplicated() %>% 
+  sum()
+
+# check for typos - by looking at impossible values
+# quick summary
+
+summary(pollution)
+
+# check for typos by looking at distinct characters/values
+pollution %>% 
+  distinct(Stress)
+
+
+# missing values
+pollution %>% 
+  is.na() %>% 
+  sum()
+
+# Visualization
+pollution %>% 
+  ggplot(aes(x = O3, y = William))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  facet_wrap(~ Stress)+
+  labs(x = expression(paste(Ozone~mu~L~L^-1)),
+       y = expression(paste(Log~Yield~(kg~ha^-1))))
+# gradient of slope does not seem to change, suspect there is not an interaction effect.
+
+# Linear model
+pollution_ls1 <- lm(William ~ O3 + Stress + O3:Stress, data = pollution)
+
+pollution_ls1 %>% 
+  broom::tidy(conf.int = T)
+
+# does not seem to be an interaction effect (differs -1.35 kg from mean, but conf intervals cross 0 )
+
+# check model fit
+
+performance::check_model(pollution_ls1)
+
+# everything looks pretty good
+
+# Simplifying the model
+
+drop1(pollution_ls1, test = "F")
+
+# accept the null hyptohesis that there is not interaction effect and so we can remove this from the model
+
+pollution_ls2 <- lm(William ~ O3 + Stress, data = pollution) 
+
+drop1(pollution_ls2, test = "F")
+# F values of simpler model
+
+pollution_ls2 %>% 
+  broom::tidy(conf.int = T)
+# estimates and confidence intervals
+
+# Report ----
+
