@@ -188,6 +188,10 @@ emmeans::emmeans(ls_2, specs = pairwise ~ light + fert + light:fert) %>%
 # import data
 pollution <- read_csv(here("data", "pollution.csv"))
 
+# Hypotheses:
+# well-watered plants will have a higher yield than stressed plants.
+# plants under stress will respond more negatively to pollution than non-stressed plants.
+
 # check the structure of the data
 glimpse(pollution)
 
@@ -245,7 +249,7 @@ performance::check_model(pollution_ls1)
 
 drop1(pollution_ls1, test = "F")
 
-# accept the null hyptohesis that there is not interaction effect and so we can remove this from the model
+# accept the null hypothesis that there is not interaction effect and so we can remove this from the model
 
 pollution_ls2 <- lm(William ~ O3 + Stress, data = pollution) 
 
@@ -258,3 +262,4 @@ pollution_ls2 %>%
 
 # Report ----
 
+# I hypothesized that well watered plants would have a greater yield than stressed plants. We found well-watered plants had a greater yield (mean = 0.178 kg [95% CL = 0.068-0.288kg])(F = 11, p = 0.03, df = 1,28). I hypothesized that stressed plants would respond more negatively to pollution than well watered plants. However we found no evidence of a negative interaction effect between stress and ozone levels (F = 0.4612, p = 0.5 df = 1,27). Although individually the plants suffered a mean decrease in yield of 7.14 kg ha-1 [5.13 - 9.15] (F1,28 = 53, P < 0.001) for every unit increase (μL L-1) of Ozone. 
